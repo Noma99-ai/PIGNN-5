@@ -1,0 +1,62 @@
+====================================================================
+  PIGNN Experiment Configuration
+====================================================================
+  Test system       : ieee33
+  Scenarios         : 200 (train 70% / val 15% / test 15%)
+  Timesteps/day     : 48
+  PV units          : 6   |  BESS units: 2
+  GNN hidden dim    : 64  |  MP rounds : 3
+  PINN hidden       : [128, 64]
+  |V| output range  : (0.9, 1.05)
+  δ   output range  : (-0.3, 0.3)
+  Loss weights      : data=1.0, PB=10.0, VB=5.0, SL=2.0, TH=3.0
+  Optimiser         : Adam (lr=0.0005)
+  Max epochs        : 100  |  Early stop: 30
+  Random seeds      : [42, 123, 256, 512, 1024]
+====================================================================
+
+  STEP 1: Initialising test system...
+    Grid      : IEEE 33-bus
+    Buses     : 33
+    Branches  : 32
+    PV buses  : [2, 7, 12, 17, 22, 27]
+    BESS buses: [2, 18]
+
+  STEP 2: Generating scenario dataset...
+  Dataset generated: train=140, val=30, test=30, ood=10
+    Generated in 0.4s
+
+=================================================================
+  STEP 3: Training all models
+=================================================================
+
+PIGNN (309,378 parameters)
+  GNN encoder  :  26,368 params  (K=3, d=64)
+  PINN decoder : 283,010 params  (hidden=[128, 64])
+  |V| range    : (0.9, 1.05)
+  δ   range    : (-0.3, 0.3)
+
+  Training PIGNN (309,378 params)...
+    Epoch   50/100: train=32.665562  val=0.079005  lr=2.58e-04  PB=2.97135  VB=0.00000
+    Early stopping at epoch 62
+    Training complete: 2235.8s, best_val=0.063178 (epoch 25)
+
+  Training StandardNN (50,690 params)...
+    Epoch   50/100: train=0.347807  val=0.334714  lr=2.58e-04  PB=0.00000  VB=0.00000
+    Epoch  100/100: train=0.196710  val=0.251903  lr=1.12e-06  PB=0.00000  VB=0.00000
+    Training complete: 731.3s, best_val=0.226840 (epoch 96)
+
+  Training GNN-Only (165,826 params)...
+    Epoch   50/100: train=0.199310  val=0.191592  lr=2.58e-04  PB=0.00000  VB=0.00000
+    Epoch  100/100: train=0.057107  val=0.068049  lr=1.12e-06  PB=0.00000  VB=0.00000
+    Training complete: 1418.2s, best_val=0.068049 (epoch 100)
+
+  Training PINN-Only (50,690 params)...
+    Epoch   50/100: train=14.577170  val=0.054992  lr=2.58e-04  PB=1.40893  VB=0.00000
+    Early stopping at epoch 62
+    Training complete: 858.0s, best_val=0.040660 (epoch 25)
+
+=================================================================
+  STEP 4: Evaluating all models on test set
+=================================================================
+Saved raw prediction arrays to results_raw/
